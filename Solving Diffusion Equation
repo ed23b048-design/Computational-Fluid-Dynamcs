@@ -1,0 +1,166 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+L_x=1
+L_y=1
+
+r_x=1
+r_y=1
+
+
+n=40
+m=20
+
+dx=np.zeros((1,n))
+dy=np.zeros((1,m))
+x=np.zeros((1,n+1))
+y=np.zeros((1,m+1))
+delta_x=np.zeros((1,n+1))
+delta_y=np.zeros((1,m+1))
+centroid_x=np.zeros((m,n))
+centroid_y=np.zeros((m,n))
+T=np.zeros((m+2,n+2))
+
+
+def calculate_dx(dx):
+    for i in range(n):
+        if r_x>1 or r_x<1:
+            dx[0,0]=L_x*((1-r_x)/(1-r_x**n))
+
+            for i in range(n):
+                dx[0,i]=dx[0,0]*(r_x**i)
+
+        else:
+            for i in range(n):
+                dx[0,i]=L_x/n        
+
+
+def calculate_dy(dy):
+        if r_y>1 or r_x<1:
+            dy[0,0]=L_y*((1-r_y)/(1-r_y**m))
+
+            for i in range(m):
+                dy[0,i]=dy[0,0]*(r_y**i)
+
+        else:
+            for i in range(m):
+                dy[0,i]=L_y/m        
+
+def calculate_x(x):
+    for i in range(n):
+        x[0,i+1]=x[0,i]+dx[0,i]
+
+def calculate_y(y):
+    for i in range(m):
+        y[0,i+1]=y[0,i]+dy[0,i]
+
+def calculate_del_x(delta_x):
+    delta_x[0,0]=dx[0,0]/2
+    delta_x[0,n]=dx[0,n-1]/2
+
+    for i in range(1,n):
+        delta_x[0,i]=(dx[0,i]+dx[0,i-1])/2
+
+
+def calculate_del_y(delta_y):
+    delta_y[0,0]=dy[0,0]/2
+    delta_y[0,m]=dy[0,m-1]/2
+
+    for i in range(1,m):
+        delta_y[0,i]=(dy[0,i-1]+dy[0,i])/2
+
+def calculate_cen_x(centroid_x):
+    for i in range(m):
+        for j in range(n):
+            centroid_x[i,j]=(x[0,j]+x[0,j+1])/2
+
+
+def calculate_cen_y(centroid_y):
+    for i in range(m):
+        for j in range(n):
+            centroid_y[m-i-1,n-j-1]=(y[0,i]+y[0,i+1])/2
+
+def K(y):
+    return 16*(1+(y/L_y))            
+
+def calculate_area(dx,dy):
+    return dx*dy
+
+calculate_dx(dx)
+calculate_dy(dy)
+calculate_x(x)
+calculate_y(y)
+calculate_del_x(delta_x)
+calculate_del_y(delta_y)
+calculate_cen_x(centroid_x)
+calculate_cen_y(centroid_y)
+
+# Boundary Conditions
+
+T[0,:]=0   # Top face
+T[m+1,:]=10 # Bottom face
+
+# Right face 
+for i in range(0,m+2):
+    T[i,n+1]=(5000*delta_x[0,0])/K(y[0,m-i])*dy[0,m-i-1]+T[i,n]
+
+
+# Left face
+T[:,0]=T[:,1]
+
+
+# Source Term (Source per area)
+
+S_u=-1.5
+S_p=0
+
+# iterations calculation
+
+max_iter=500
+tolerance=0
+error=[]
+e=0
+F=10
+
+# Applying Guass Siedel method for solving system of linear equations
+
+for it in range(max_iter):
+    T_new=T.copy()
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            a_E=(K(y[0,m-i+1]/2)*dy[0,m-i])/delta_x[0,j]
+            a_W=(K(y[0,m-i+1]/2)*dy[0,m-i])/delta_x[0,j-1]
+            a_N=(K(y[0,m-i+1])*dx[0,j-1])/delta_y[0,i]
+            a_S=(K(y[0,m-i+1])*dx[0,j-1])/delta_y[0,i-1]
+            a_P=a_E+a_W+a_N+a_S-S_p*calculate_area(dx[0,j-1],dy[0,m-i])
+
+            T_new[m-i+1,n-j+1]=(a_E*T[i,j+1]+a_W*T[i,j-1]
+                        +a_N*T[i-1,j]+a_S*T[i+1,j]+S_u*calculate_area(dx[0,j-1],dy[0,m-i]))/a_P
+  
+    T=T_new.copy()
+
+        
+#-------------------------------------------------------------------------------------------------#
+
+xx=np.zeros((1,n+2))
+yy=np.zeros((1,m+2))
+
+
+for i in range(n+1):
+    xx[0,i+1]=xx[0,i]+delta_x[0,i]
+
+for i in range(m+1):
+    yy[0,i+1]=yy[0,i]+delta_y[0,i]
+
+X,Y=np.meshgrid(xx,yy)    
+
+plt.contourf(X,Y,T,50,cmap="turbo_r")
+plt.colorbar()
+
+plt.xlabel("L_X")
+plt.ylabel("L_Y")
+plt.title("Conduction in 2D domain")
+plt.show()
+
+
+# cmap="gist_earth"
