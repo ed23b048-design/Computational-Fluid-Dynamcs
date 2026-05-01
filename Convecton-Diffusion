@@ -110,9 +110,6 @@ def f(x,y):
 def calculate_area(x,y):
     return x*y
 
-def Pe(dx):
-    return rho*u*dx/gamma
-
 
 # Calling out functions 
 
@@ -125,7 +122,7 @@ calculate_delta_y(delta_y)
 calculate_centroid_x(cen_x,x)
 calculate_centroid_y(cen_y,y)
 
-# boundary conditions
+# Boundary conditions
 
 T[-1,:]=1
 T[:,0]=1
