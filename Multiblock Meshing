@@ -1,0 +1,221 @@
+# Multiblock Meshing for different meshing patterns along the domain
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+L_x=3  # Length in X domain
+L_y=3  # Length in y domain
+
+
+n_0=2    # No of main divisions (by default taken 2)
+n_1=10   # No of divisions in x in first division 
+n_2=10   # No of divisions in x in second division
+n_3=10   # No of divisions in x in third division
+n_4=10   # No of divisions in x in fourth division
+
+m_0=2    # No of main divisions (by default taken 2)
+m_1=10   # No of divisions in y in first division 
+m_2=10   # No of divisions in y in second division
+m_3=10   # No of divisions in y in third division
+m_4=10   # No of divisions in y in fourth division
+
+r_x_0=1     # Stretching factor in x for main division   
+r_x_1=0.7   # Stretching factor in x for 1st division
+r_x_2=1.3   # stretching factor in x for 2nd division  
+r_x_3=0.7   # Stretching factor in x for 3rd division
+r_x_4=1.3   # Stretching factor in x for 4th division
+
+r_y_0=1     # Stretching  factor in y for main division
+r_y_1=0.7   # Stretching factor i y for 1st division
+r_y_2=0.7   # Stretching factor in y for 2nd division
+r_y_3=1.3   # Stretching factor in y for 3rd division
+r_y_4=1.3  # Stretching factor in y for 4th division
+
+dx_0=[0 for _ in range(n_0)]
+dx_1=[0 for _ in range(n_1)]
+dx_2=[0 for _ in range(n_2)]
+dx_3=[0 for _ in range(n_3)]
+dx_4=[0 for _ in range(n_4)]
+
+x_0=[0 for _ in range(n_0+1)]
+x_1=[0 for _ in range(n_1+1)]
+x_2=[0 for _ in range(n_2+1)]
+x_3=[0 for _ in range(n_3+1)]
+x_4=[0 for _ in range(n_4+1)]
+
+dy_0=[0 for _ in range(m_0)]
+dy_1=[0 for _ in range(m_1)]
+dy_2=[0 for _ in range(m_2)]
+dy_3=[0 for _ in range(m_3)]
+dy_4=[0 for _ in range(m_4)]
+
+y_0=[0 for _ in range(m_0+1)]
+y_1=[0 for _ in range(m_1+1)]
+y_2=[0 for _ in range(m_2+1)]
+y_3=[0 for _ in range(m_3+1)]
+y_4=[0 for _ in range(m_4+1)]
+
+
+
+if r_x_0==1 and r_y_0==1:
+    
+    # Main Division
+
+    for i in range(n_0):
+        dx_0[i]=(L_x/n_0)
+        dy_0[i]=(L_y/m_0)
+    
+    # First division
+
+    dx_1[0]=dx_0[0]*((r_x_1-1)/(r_x_1**n_1-1))
+
+    for i in range(n_1):
+        dx_1[i]=dx_1[0]*(r_x_1**i)  
+
+    dy_1[0]=dy_0[0]*((r_y_1-1)/(r_y_1**m_1-1))
+
+    for i in range(m_1):
+        dy_1[i]=dy_1[0]*(r_y_1**i)
+
+
+    # Second division    
+
+    dx_2[0]=dx_0[1]*((r_x_2-1)/(r_x_2**n_2-1))
+
+    for i in range(n_2):
+        dx_2[i]=dx_2[0]*(r_x_2**i)
+
+    dy_2[0]=dy_0[1]*((r_y_2-1)/(r_y_2**m_2-1))
+
+    for i in range(m_2):
+        dy_2[i]=dy_2[0]*(r_y_2**i)
+
+
+    # Third Division
+
+    dx_3[0]=dx_0[0]*((r_x_3-1)/(r_x_3**n_3-1))  
+
+    for i in range(n_3):
+        dx_3[i]=dx_3[0]*(r_x_3**i)
+
+    dy_3[0]=dy_0[0]*((r_y_3-1)/(r_y_3**m_3-1))
+
+    for i in range(m_3):
+        dy_3[i]=dy_3[0]*(r_y_3**i)
+
+
+    # Fourth Division    
+
+    dx_4[0]=dx_0[1]*(r_x_4-1)/(r_x_4**n_4-1)
+
+    for i in range(n_4):
+        dx_4[i]=dx_4[0]*(r_x_4**i)
+
+    dy_4[0]=dy_0[0]*((r_y_4-1)/(r_y_4**m_4-1))
+
+    for i in range(m_4):
+        dy_4[i]=dy_4[0]*(r_y_4**i)    
+
+
+# taking the values of x coordinate of the grid points
+
+# Main division 
+for i in range(n_0):
+    x_0[i+1]=x_0[i]+dx_0[i]
+
+for i in range(m_0):
+    y_0[i+1]=y_0[i]+dy_0[i]
+
+# First division
+for i in range(n_1):
+    x_1[i+1]=x_1[i]+dx_1[i]
+
+for i in range(m_1):
+    y_1[i+1]=y_1[i]+dy_1[i]
+
+# Second division
+x_2[0]=dx_0[0]
+for i in range(n_2):
+    x_2[i+1]=x_2[i]+dx_2[i]
+
+for i in range(m_2):
+    y_2[i+1]=y_2[i]+dy_2[i]
+
+# Third division
+for i in range(n_3):
+    x_3[i+1]=x_3[i]+dx_3[i]
+
+y_3[0]=dy_0[1]
+for i in range(m_3):
+    y_3[i+1]=y_3[i]+dy_3[i]
+
+# Fourth division
+x_4[0]=dx_0[1]
+for i in range(n_4):
+    x_4[i+1]=x_4[i]+dx_4[i]
+
+
+y_4[0]=dy_0[1]
+for i in range(m_4):
+    y_4[i+1]=y_4[i]+dy_4[i]
+
+
+
+# plotting of first division
+for i in x_1:
+    plt.plot([i,i],[0,dy_0[0]],color="black",linestyle="--",lw=0.5)
+
+for i in y_1:
+    plt.plot([0,dx_0[0]],[i,i],color="black",linestyle="--",lw=0.5) 
+
+# plotting  second division
+for i in x_2:
+    plt.plot([i,i],[0,dy_0[1]],color="black",linestyle="--",lw=0.5)
+
+for i in y_2:
+    plt.plot([dx_0[0],L_x],[i,i],color="black",linestyle="--",lw=0.5)
+
+# plotting third division
+for i in x_3:
+    plt.plot([i,i],[dy_0[0],L_y],color="black",linestyle="--",lw=0.5)  
+
+for i in y_3:
+    plt.plot([0,dy_0[0]],[i,i],color="black",linestyle="--",lw=0.5)    
+
+# plotting fourth division
+for i in x_4:
+    plt.plot([i,i],[dx_0[0],L_y],color="black",linestyle="--",lw=0.5)  
+
+for i in y_4:
+    plt.plot([dy_0[0],L_x],[i,i],color="black",linestyle="--",lw=0.5)
+
+# plotting of main division
+for i in x_0:
+    plt.plot([i,i],[0,L_y],color="black",linestyle="-",lw=1)
+
+for i in y_0:
+    plt.plot([0,L_x],[i,i],color="black",linestyle="-",lw=1)
+
+
+# Plotting the centroids of  the cells
+
+for i in range(n_1):
+    for j in range(m_1):
+        plt.plot((x_1[i]+x_1[i+1])/2,(y_1[j]+y_1[j+1])/2,".")
+
+for i in range(n_2):
+    for j in range(m_2):
+        plt.plot((x_2[i]+x_2[i+1])/2,(y_2[j]+y_2[j+1])/2,".")         
+
+for i in range(n_3):
+    for j in range(m_3):
+        plt.plot((x_3[i]+x_3[i+1])/2,(y_3[j]+y_3[j+1])/2,".")  
+
+for i in range(n_4):
+    for j in range(m_4):
+        plt.plot((x_4[i]+x_4[i+1])/2,(y_4[j]+y_4[j+1])/2,".")  
+
+plt.xlabel("L_x")
+plt.ylabel("L_y")
+plt.title("Discretization of domain")
+plt.show()        
