@@ -1,4 +1,4 @@
-# Computational-Fluid-Dynamcs
+# Computational-Fluid-Dynamics
 
 In this repository we will see the idea behind CFD. 
 Computational Flud dynamics has three processes:
